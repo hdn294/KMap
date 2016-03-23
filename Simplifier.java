@@ -14,55 +14,20 @@ public class Simplifier {
 	private int NUMBER_OF_VARIABLE = 0;
 	
 	private String[] VARIABLE_NAME = new String[] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "L", "M", "N"};
-	private int VARIABLE;
 	
 
 	public String getSimplifier(int[] arrMinTerms, int[] arrIgnorances, int variable) {
 		String functionSimplify = "";
-		VARIABLE = variable;
+		NUMBER_OF_VARIABLE = variable;
 		
-		NUMBER_OF_VARIABLE = getNumberOfVariable(arrMinTerms);
+		
 		MINTERMS = toBinary(arrMinTerms);
 		IGNORANCE = toBinary(arrIgnorances);
-		
-		printArray(MINTERMS);
-		printArray(IGNORANCE);
 
 		functionSimplify = completeMethods();
 		return functionSimplify;
 	}
 
-	private int getNumberOfVariable(int[] min_array) {
-		int max = 0;
-		int a = 0;
-
-		while (min_array[a] != -1) {
-			if (min_array[a] > max) 
-			{
-				max = min_array[a];
-			}
-			a++;
-		}
-		if (max == 0) return 0; 
-		else if (max == 1) return 1;
-		else if (max > 1 && max < 4) return 2; 
-		else if (max >= 4 && max < 8) return 3; 
-		else if (max >= 8 && max < 16) return 4; 
-		else if (max >= 16 && max < 32) return 5; 
-		else if (max >= 32 && max < 64) return 6; 
-		else if (max >= 65 && max < 128) return 7; 
-		else if (max >= 128 && max < 256) return 8;		
-		else if (max >= 256 && max < 512) return 9; 
-		else if (max >= 512 && max < 1024) return 10; 
-		else if (max >= 1024 && max < 2048) return 11; 
-		else if (max >= 2048 && max < 4096) return 12; 
-		else if (max > 2048 && max < 8192) return 13; 
-		else 
-		{
-			System.out.println("Only process upto the minterm less than 8191");
-		}
-		return -1;
-	}
 	
 	private void printArray (String[] anArray)
 	{
@@ -73,31 +38,31 @@ public class Simplifier {
 		System.out.println();
 	}
 
-	private String[] toBinary(int[] min_array) {
+	private String[] toBinary(int[] minArray) {
 		int a = 0;
-		String[] return_minterms = new String[200];
-		return_minterms = fill1DArray(return_minterms);
+		String[] returnMinTerms = new String[200];
+		returnMinTerms = fill1DArray(returnMinTerms);
 
-		while (min_array[a] != -1) {
-			return_minterms[a] = toBinaryString(min_array[a]);
+		while (minArray[a] != -1) {
+			returnMinTerms[a] = toBinaryString(minArray[a]);
 			a++;
 		}
-		return return_minterms;
+		return returnMinTerms;
 	}
 
 	private String completeMethods() {
 		int a = 0, b = 0;
-		String[][] final_pass = new String[ARRAY_MAGNITUDE][ARRAY_MAGNITUDE];
+		String[][] finalPass = new String[ARRAY_MAGNITUDE][ARRAY_MAGNITUDE];
 
-		String[][] remaining_minterms = new String[ARRAY_MAGNITUDE][ARRAY_MAGNITUDE];
-		remaining_minterms = fillArrays(remaining_minterms);
+		String[][] remainingMinterms = new String[ARRAY_MAGNITUDE][ARRAY_MAGNITUDE];
+		remainingMinterms = fillArrays(remainingMinterms);
 
-		final_pass = fillArrays(final_pass);
+		finalPass = fillArrays(finalPass);
 		PRIME_CALC = fillArrays(PRIME_CALC);
 		PASS_IGNORANCE = fill1DArray(PASS_IGNORANCE);
 		SUB_MINTERMS = fill1DArray(SUB_MINTERMS);
 
-		final_pass = fillMinterms(MINTERMS);		
+		finalPass = fillMinterms(MINTERMS);		
 		while (MINTERMS[a] != "-1") {
 			a++;
 		}
@@ -111,12 +76,12 @@ public class Simplifier {
 		a = 0;
 		b = 0;
 
-		final_pass = fillMinterms(MINTERMS);
+		finalPass = fillMinterms(MINTERMS);
 
-		for (int i = 0; i < final_pass.length; i++) {
-			for (int j = 0; j < final_pass[i].length; j++) {
-				if (final_pass[i][j] != "-1") {
-					PRIME_CALC[b][0] = final_pass[i][j];
+		for (int i = 0; i < finalPass.length; i++) {
+			for (int j = 0; j < finalPass[i].length; j++) {
+				if (finalPass[i][j] != "-1") {
+					PRIME_CALC[b][0] = finalPass[i][j];
 					b++;
 				}
 			}
@@ -124,13 +89,13 @@ public class Simplifier {
 		}
 		PASS_IGNORANCE = fillDontCare(IGNORANCE);
 		while (IS_COMPLETE != 'T') {
-			final_pass = compareAdjacentMinterms(final_pass);
+			finalPass = compareAdjacentMinterms(finalPass);
 		}
 
 		removeDuplicatePrimes();
-		remaining_minterms = getEssentialPrimes();
-		if (remaining_minterms[0][0] != "-1") {
-			remaining_minterms = getPrimes(remaining_minterms);
+		remainingMinterms = getEssentialPrimes();
+		if (remainingMinterms[0][0] != "-1") {
+			remainingMinterms = getPrimes(remainingMinterms);
 		}
 
 		a = 0;
@@ -145,144 +110,128 @@ public class Simplifier {
 		return giveOutput(SUB_MINTERMS);
 	}
 
-	private String[][] fillMinterms(String[] input_min) {
-		String temp_min;
+	private String[][] fillMinterms(String[] arrMinterms) {
+		String tempMinterm;
 		int a = 0, count;
 		int ones = 0, twos = 0, threes = 0, fours = 0, fives = 0, sixes = 0, sevens = 0, eights = 0, nines = 0,
 				tens = 0, elevens = 0, twelves = 0, thirteens = 0;
-		String[][] group_wise = new String[100][100];
-		fillArrays(group_wise);
+		String[][] groupWise = new String[100][100];
+		fillArrays(groupWise);
 
-		while (input_min[a] != "-1") {
-
+		while (arrMinterms[a] != "-1") {
 			count = 0;
-			temp_min = input_min[a];
+			tempMinterm = arrMinterms[a];
 
-			while (temp_min.length() < NUMBER_OF_VARIABLE) {
-				temp_min = "0" + temp_min;
+			while (tempMinterm.length() < NUMBER_OF_VARIABLE) {
+				tempMinterm = "0" + tempMinterm;
 			}
 
-			for (int i = 0; i < temp_min.length(); i++) {
-				if (temp_min.charAt(i) == '1') {
+			for (int i = 0; i < tempMinterm.length(); i++) {
+				if (tempMinterm.charAt(i) == '1') {
 					count++;
 				}
 			}
 
 			if (count == 0) {
-				group_wise[0][0] = temp_min;
+				groupWise[0][0] = tempMinterm;
 			} else if (count == 1) {
-
-				group_wise[1][ones] = temp_min;
+				groupWise[1][ones] = tempMinterm;
 				ones++;
 			} else if (count == 2) {
-
-				group_wise[2][twos] = temp_min;
+				groupWise[2][twos] = tempMinterm;
 				twos++;
 			} else if (count == 3) {
-
-				group_wise[3][threes] = temp_min;
+				groupWise[3][threes] = tempMinterm;
 				threes++;
 			} else if (count == 4) {
-
-				group_wise[4][fours] = temp_min;
+				groupWise[4][fours] = tempMinterm;
 				fours++;
 			} else if (count == 5) {
-
-				group_wise[5][fives] = temp_min;
+				groupWise[5][fives] = tempMinterm;
 				fives++;
 			} else if (count == 6) {
-
-				group_wise[6][sixes] = temp_min;
+				groupWise[6][sixes] = tempMinterm;
 				sixes++;
-			}
-
-			else if (count == 7) {
-
-				group_wise[7][sevens] = temp_min;
+			} else if (count == 7) {
+				groupWise[7][sevens] = tempMinterm;
 				sevens++;
 			} else if (count == 8) {
-
-				group_wise[8][eights] = temp_min;
+				groupWise[8][eights] = tempMinterm;
 				eights++;
 			} else if (count == 9) {
-
-				group_wise[9][nines] = temp_min;
+				groupWise[9][nines] = tempMinterm;
 				nines++;
 			} else if (count == 10) {
-
-				group_wise[10][tens] = temp_min;
+				groupWise[10][tens] = tempMinterm;
 				tens++;
 			} else if (count == 11) {
-
-				group_wise[11][elevens] = temp_min;
+				groupWise[11][elevens] = tempMinterm;
 				elevens++;
 			} else if (count == 12) {
-
-				group_wise[12][twelves] = temp_min;
+				groupWise[12][twelves] = tempMinterm;
 				twelves++;
 			} else if (count == 13) {
-
-				group_wise[12][thirteens] = temp_min;
+				groupWise[12][thirteens] = tempMinterm;
 				thirteens++;
 			}
 
 			a++;
 		}
 
-		return group_wise;
+		return groupWise;
 	}
 
-	private String[] fillDontCare(String[] input_min) {
-		String[] group_wise_dontcare = new String[ARRAY_MAGNITUDE];
-		group_wise_dontcare = fill1DArray(group_wise_dontcare);
-		String temp_min;
+	private String[] fillDontCare(String[] arrMinterms) {
+		String[] groupWiseIgnorance = new String[ARRAY_MAGNITUDE];
+		groupWiseIgnorance = fill1DArray(groupWiseIgnorance);
+		String tempMinterm;
 		int a = 0, b = 0;
 
-		while (input_min[a] != "-1") {
+		while (arrMinterms[a] != "-1") {
 
-			temp_min = input_min[a];
+			tempMinterm = arrMinterms[a];
 
-			while (temp_min.length() < NUMBER_OF_VARIABLE) {
-				temp_min = "0" + temp_min;
+			while (tempMinterm.length() < NUMBER_OF_VARIABLE) {
+				tempMinterm = "0" + tempMinterm;
 			}
 
-			group_wise_dontcare[b] = temp_min;
+			groupWiseIgnorance[b] = tempMinterm;
 			b++;
 			a++;
 		}
 
-		return group_wise_dontcare;
+		return groupWiseIgnorance;
 	}
 
-	private String[][] compareAdjacentMinterms(String[][] group_wise) {
-		String[][] all_combined = new String[ARRAY_MAGNITUDE][ARRAY_MAGNITUDE];
+	private String[][] compareAdjacentMinterms(String[][] groupWise) {
+		String[][] allArrayCombined = new String[ARRAY_MAGNITUDE][ARRAY_MAGNITUDE];
 		int count = 0, c = 0;
 		int index = 0;
-		int min_comp = 0, min_comp2 = 1, min_comp1 = 0, min_comp3 = 0;
+		int minComp = 0, minComp2 = 1, minComp1 = 0, minComp3 = 0;
 		int index1 = 0, index2 = 0;
 
 		for (int i = 0; i < ARRAY_MAGNITUDE; i++) {
 			for (int j = 0; j < ARRAY_MAGNITUDE; j++) {
-				all_combined[i][j] = "-1";
+				allArrayCombined[i][j] = "-1";
 			}
 		}
-		while (c < group_wise.length) {
-			if (group_wise[c][0] != "-1" && group_wise[c + 1][0] != "-1")
+		while (c < groupWise.length) {
+			if (groupWise[c][0] != "-1" && groupWise[c + 1][0] != "-1")
 				count++;
 			c++;
 		}
 
 		if (count >= 1) {
 			count = 0;
-			while (min_comp < group_wise.length - 1) {
+			while (minComp < groupWise.length - 1) {
 
-				while (group_wise[min_comp][min_comp1] != "-1") {
+				while (groupWise[minComp][minComp1] != "-1") {
 
-					while (group_wise[min_comp2][min_comp3] != "-1") {
+					while (groupWise[minComp2][minComp3] != "-1") {
 
 						for (int ij = 0; ij < NUMBER_OF_VARIABLE; ij++) {
 
-							if (group_wise[min_comp][min_comp1].charAt(ij) != group_wise[min_comp2][min_comp3]
+							if (groupWise[minComp][minComp1].charAt(ij) != groupWise[minComp2][minComp3]
 									.charAt(ij)) {
 								count++;
 								index = ij;
@@ -291,34 +240,34 @@ public class Simplifier {
 
 						if (count == 1) {
 
-							all_combined[index1][index2] = group_wise[min_comp2][min_comp3].substring(0, index) + 'x'
-									+ group_wise[min_comp2][min_comp3].substring(index + 1, NUMBER_OF_VARIABLE);
+							allArrayCombined[index1][index2] = groupWise[minComp2][minComp3].substring(0, index) + 'x'
+									+ groupWise[minComp2][minComp3].substring(index + 1, NUMBER_OF_VARIABLE);
 
-							primeFill(all_combined[index1][index2], group_wise[min_comp][min_comp1],
-									group_wise[min_comp2][min_comp3]);
+							primeFill(allArrayCombined[index1][index2], groupWise[minComp][minComp1],
+									groupWise[minComp2][minComp3]);
 							index2++;
 
 						}
 
 						count = 0;
-						min_comp3++;
+						minComp3++;
 
 					}
 
-					min_comp3 = 0;
+					minComp3 = 0;
 
-					min_comp1++;
+					minComp1++;
 
 				}
 
-				min_comp++;
-				min_comp2++;
-				min_comp1 = 0;
+				minComp++;
+				minComp2++;
+				minComp1 = 0;
 
 				index1++;
 
 				index2 = 0;
-				min_comp3 = 0;
+				minComp3 = 0;
 
 			}
 			IS_FIRST_PRIME = 'F';
@@ -326,7 +275,7 @@ public class Simplifier {
 
 		else
 			IS_COMPLETE = 'T';
-		return all_combined;
+		return allArrayCombined;
 	}
 
 	private void primeFill(String result, String op1, String op2) {
@@ -361,34 +310,34 @@ public class Simplifier {
 	}
 
 	private void removeDuplicatePrimes() {
-		int prime_calc_index = 0, current_index = 1, check_index = 2, temp_check_index = 0;
+		int primeCalcIndex = 0, currentIndex = 1, checkIndex = 2, tempCheckIndex = 0;
 
-		while (PRIME_CALC[prime_calc_index][0] != "-1") {
-			while (PRIME_CALC[prime_calc_index][current_index] != "-1") {
-				check_index = current_index + 1;
-				while (PRIME_CALC[prime_calc_index][check_index] != "-1") {
-					temp_check_index = check_index;
+		while (PRIME_CALC[primeCalcIndex][0] != "-1") {
+			while (PRIME_CALC[primeCalcIndex][currentIndex] != "-1") {
+				checkIndex = currentIndex + 1;
+				while (PRIME_CALC[primeCalcIndex][checkIndex] != "-1") {
+					tempCheckIndex = checkIndex;
 
-					if (PRIME_CALC[prime_calc_index][current_index].equals(PRIME_CALC[prime_calc_index][check_index])) {
+					if (PRIME_CALC[primeCalcIndex][currentIndex].equals(PRIME_CALC[primeCalcIndex][checkIndex])) {
 
-						while (PRIME_CALC[prime_calc_index][temp_check_index] != "-1") {
-							PRIME_CALC[prime_calc_index][temp_check_index] = PRIME_CALC[prime_calc_index][temp_check_index
+						while (PRIME_CALC[primeCalcIndex][tempCheckIndex] != "-1") {
+							PRIME_CALC[primeCalcIndex][tempCheckIndex] = PRIME_CALC[primeCalcIndex][tempCheckIndex
 									+ 1];
-							temp_check_index++;
+							tempCheckIndex++;
 						}
 
-						PRIME_CALC[prime_calc_index][temp_check_index] = "-1";
-						check_index--;
+						PRIME_CALC[primeCalcIndex][tempCheckIndex] = "-1";
+						checkIndex--;
 					}
 
-					check_index++;
+					checkIndex++;
 				}
-				current_index++;
+				currentIndex++;
 			}
 
-			current_index = 1;
-			check_index = 2;
-			prime_calc_index++;
+			currentIndex = 1;
+			checkIndex = 2;
+			primeCalcIndex++;
 		}
 
 	}
@@ -397,11 +346,11 @@ public class Simplifier {
 		int i = 0, j = 0;
 		int a = 0, b = 0;
 		SUB_MIN_INDEX = 0;
-		String[] temp_back = new String[ARRAY_MAGNITUDE];
-		temp_back = fill1DArray(temp_back);
+		String[] tempBack = new String[ARRAY_MAGNITUDE];
+		tempBack = fill1DArray(tempBack);
 
-		String[][] temp_prime_calc = new String[ARRAY_MAGNITUDE][ARRAY_MAGNITUDE];
-		temp_prime_calc = fillArrays(temp_prime_calc);
+		String[][] tempPrimeCalc = new String[ARRAY_MAGNITUDE][ARRAY_MAGNITUDE];
+		tempPrimeCalc = fillArrays(tempPrimeCalc);
 
 		while (PRIME_CALC[i][0] != "-1") {
 			while (PASS_IGNORANCE[j] != "-1") {
@@ -445,7 +394,7 @@ public class Simplifier {
 		while (PRIME_CALC[a][0] != "-1") {
 			if (PRIME_CALC[a][0] != "D" && PRIME_CALC[a][0] != "Y") {
 				while (PRIME_CALC[a][b] != "-1") {
-					temp_prime_calc[c][d] = PRIME_CALC[a][b];
+					tempPrimeCalc[c][d] = PRIME_CALC[a][b];
 					b++;
 					d++;
 
@@ -458,27 +407,27 @@ public class Simplifier {
 			d = 0;
 		}
 
-		return temp_prime_calc;
+		return tempPrimeCalc;
 
 	}
 
-	private String[][] getPrimes(String[][] temp_prime_calc) {
+	private String[][] getPrimes(String[][] tempPrimeCalc) {
 		int a = 0, b = 1, c = 0, d = 0, i = 0;
 		int count = 0;
-		String max_minterm;
-		int max_index = 0;
+		String maxMinterm;
+		int maxIndex = 0;
 		String[] primes = new String[ARRAY_MAGNITUDE];
 		primes = fill1DArray(primes);
 
-		int[] prime_count = new int[ARRAY_MAGNITUDE];
-		prime_count = fill1DIntArray(prime_count);
+		int[] primeCount = new int[ARRAY_MAGNITUDE];
+		primeCount = fill1DIntArray(primeCount);
 
-		String[][] temp_prime_calc2 = new String[ARRAY_MAGNITUDE][ARRAY_MAGNITUDE];
-		temp_prime_calc2 = fillArrays(temp_prime_calc2);
+		String[][] tempPrimeCalc2 = new String[ARRAY_MAGNITUDE][ARRAY_MAGNITUDE];
+		tempPrimeCalc2 = fillArrays(tempPrimeCalc2);
 
-		while (temp_prime_calc[a][0] != "-1") {
-			while (temp_prime_calc[a][b] != "-1") {
-				primes[i] = temp_prime_calc[a][b];
+		while (tempPrimeCalc[a][0] != "-1") {
+			while (tempPrimeCalc[a][b] != "-1") {
+				primes[i] = tempPrimeCalc[a][b];
 				b++;
 				i++;
 			}
@@ -488,9 +437,9 @@ public class Simplifier {
 		a = 0;
 		i = 0;
 		while (primes[i] != "-1") {
-			while (temp_prime_calc[a][0] != "-1") {
-				while (temp_prime_calc[a][b] != "-1") {
-					if (primes[i] == temp_prime_calc[a][b]) {
+			while (tempPrimeCalc[a][0] != "-1") {
+				while (tempPrimeCalc[a][b] != "-1") {
+					if (primes[i] == tempPrimeCalc[a][b]) {
 						count++;
 						b = 1;
 						break;
@@ -504,32 +453,32 @@ public class Simplifier {
 			a = 0;
 			b = 1;
 			i++;
-			prime_count[c] = count;
+			primeCount[c] = count;
 			count = 0;
 			c++;
 		}
 
 		count = 0;
 		c = 0;
-		while (prime_count[c] != -1) {
-			if (prime_count[c] > count) {
-				count = prime_count[c];
-				max_index = c;
+		while (primeCount[c] != -1) {
+			if (primeCount[c] > count) {
+				count = primeCount[c];
+				maxIndex = c;
 			}
 			c++;
 		}
 		a = 0;
 		b = 1;
-		max_minterm = primes[max_index];
-		if (max_minterm != "-1") {
-			SUB_MINTERMS[SUB_MIN_INDEX] = max_minterm;
+		maxMinterm = primes[maxIndex];
+		if (maxMinterm != "-1") {
+			SUB_MINTERMS[SUB_MIN_INDEX] = maxMinterm;
 			SUB_MIN_INDEX++;
 		}
 
-		while (temp_prime_calc[a][0] != "-1") {
-			while (temp_prime_calc[a][b] != "-1") {
-				if (temp_prime_calc[a][b].equals(max_minterm)) {
-					temp_prime_calc[a][0] = "Y";
+		while (tempPrimeCalc[a][0] != "-1") {
+			while (tempPrimeCalc[a][b] != "-1") {
+				if (tempPrimeCalc[a][b].equals(maxMinterm)) {
+					tempPrimeCalc[a][0] = "Y";
 				}
 
 				b++;
@@ -545,7 +494,7 @@ public class Simplifier {
 
 		while (PRIME_CALC[a][0] != "-1") {
 			while (PRIME_CALC[a][b] != "-1") {
-				if (PRIME_CALC[a][b].equals(max_minterm)) {
+				if (PRIME_CALC[a][b].equals(maxMinterm)) {
 					PRIME_CALC[a][0] = "Y";
 				}
 
@@ -559,10 +508,10 @@ public class Simplifier {
 		b = 0;
 		c = 0;
 		d = 0;
-		while (temp_prime_calc[a][0] != "-1") {
-			if (temp_prime_calc[a][0] != "Y") {
-				while (temp_prime_calc[a][b] != "-1") {
-					temp_prime_calc2[c][d] = temp_prime_calc[a][b];
+		while (tempPrimeCalc[a][0] != "-1") {
+			if (tempPrimeCalc[a][0] != "Y") {
+				while (tempPrimeCalc[a][b] != "-1") {
+					tempPrimeCalc2[c][d] = tempPrimeCalc[a][b];
 					b++;
 					d++;
 
@@ -575,116 +524,116 @@ public class Simplifier {
 			d = 0;
 		}
 
-		return temp_prime_calc2;
+		return tempPrimeCalc2;
 
 	}
 
-	private String giveOutput(String[] output_array) {
+	private String giveOutput(String[] arrOutput) {
 		int count = 0;
-		String[] minimized_array = new String[ARRAY_MAGNITUDE];
-		fill1DArray(minimized_array);
-		int minimized_index = 0;
-		String output_string = "";
-		String temp_minterm = "";
-		String temp_minterm_check = "";
+		String[] minimizedArray = new String[ARRAY_MAGNITUDE];
+		fill1DArray(minimizedArray);
+		int minimizedIndex = 0;
+		String outputString = "";
+		String tempMinterm = "";
+		String tempMintermCheck = "";
 		int i = 0;
 
-		while (output_array[i] != "-1") {
+		while (arrOutput[i] != "-1") {
 			for (int ij = NUMBER_OF_VARIABLE - 1; ij >= 0; ij--) {
-				if (output_array[i].charAt(ij) != 'x') {
-					if (output_array[i].charAt(ij) == '0') {						
-						temp_minterm_check = VARIABLE_NAME[ij] + "'";
+				if (arrOutput[i].charAt(ij) != 'x') {
+					if (arrOutput[i].charAt(ij) == '0') {						
+						tempMintermCheck = VARIABLE_NAME[ij] + "'";
 					}
-					if (output_array[i].charAt(ij) == '1') {						
-						temp_minterm_check = VARIABLE_NAME[ij];
+					if (arrOutput[i].charAt(ij) == '1') {						
+						tempMintermCheck = VARIABLE_NAME[ij];
 					}
-					temp_minterm = temp_minterm + temp_minterm_check;
+					tempMinterm = tempMintermCheck + tempMinterm;
 
 				}
 			}
 
 			i++;
 
-			for (int j = 0; j < minimized_array.length; j++) {
+			for (int j = 0; j < minimizedArray.length; j++) {
 
-				if (minimized_array[j].equals(temp_minterm)) {
+				if (minimizedArray[j].equals(tempMinterm)) {
 					count++;
 				}
 			}
 
 			if (count == 0) {
-				minimized_array[minimized_index] = temp_minterm;
-				minimized_index++;
+				minimizedArray[minimizedIndex] = tempMinterm;
+				minimizedIndex++;
 			}
-			temp_minterm = "";
+			tempMinterm = "";
 			count = 0;
 
 		}
 		i = 0;
 
-		minimized_index = 0;
-		while (minimized_array[minimized_index] != "-1") {
-			output_string = output_string + "+" + minimized_array[minimized_index];
-			minimized_index++;
+		minimizedIndex = 0;
+		while (minimizedArray[minimizedIndex] != "-1") {
+			outputString = outputString + "+" + minimizedArray[minimizedIndex];
+			minimizedIndex++;
 		}
-		output_string = output_string.substring(1, output_string.length());
-		return output_string;
+		outputString = outputString.substring(1, outputString.length());
+		return outputString;
 	}
 
 	/*
-	private String[][] fillDontCares(String[][] filling_array) {
+	private String[][] fillDontCares(String[][] arrToFill) {
 		int final_pass_dontcare_index = 0;
 		while (PASS_IGNORANCE[final_pass_dontcare_index] != "-1") {
-			for (int i = 0; i < filling_array.length; i++) {
-				for (int j = 0; j < filling_array[i].length; j++) {
-					if (PASS_IGNORANCE[final_pass_dontcare_index].equals(filling_array[i][j])) {
-						filling_array[i][j] = "-1";
+			for (int i = 0; i < arrToFill.length; i++) {
+				for (int j = 0; j < arrToFill[i].length; j++) {
+					if (PASS_IGNORANCE[final_pass_dontcare_index].equals(arrToFill[i][j])) {
+						arrToFill[i][j] = "-1";
 
 					}
 				}
 			}
 			final_pass_dontcare_index++;
 		}
-		return filling_array;
+		return arrToFill;
 	}
 	*/
 
-	private String[][] fillArrays(String[][] all_combined) {
-		for (int i = 0; i < all_combined.length; i++) {
-			for (int j = 0; j < all_combined[i].length; j++) {
-				all_combined[i][j] = "-1";
+	private String[][] fillArrays(String[][] allArrayCombined) {
+		for (int i = 0; i < allArrayCombined.length; i++) {
+			for (int j = 0; j < allArrayCombined[i].length; j++) {
+				allArrayCombined[i][j] = "-1";
 			}
 		}
 
-		return all_combined;
+		return allArrayCombined;
 	}
 
 	/*
-	private int[][] fillIntArrays(int[][] all_combined) {
-		for (int i = 0; i < all_combined.length; i++) {
-			for (int j = 0; j < all_combined[i].length; j++) {
-				all_combined[i][j] = -1;
+	private int[][] fillIntArrays(int[][] allArrayCombined) {
+		for (int i = 0; i < allArrayCombined.length; i++) {
+			for (int j = 0; j < allArrayCombined[i].length; j++) {
+				allArrayCombined[i][j] = -1;
 			}
 		}
 
-		return all_combined;
+		return allArrayCombined;
 	}
 	*/
 
-	private String[] fill1DArray(String[] filling_array) {
-		for (int i = 0; i < filling_array.length; i++) {
-			filling_array[i] = "-1";
+	private String[] fill1DArray(String[] arrToFill) {
+		for (int i = 0; i < arrToFill.length; i++) {
+			arrToFill[i] = "-1";
 		}
-		return filling_array;
+		return arrToFill;
 	}
 
-	private int[] fill1DIntArray(int[] temp_array) {
+	private int[] fill1DIntArray(int[] arrToFill) {
 
-		for (int i = 0; i < temp_array.length; i++) {
-			temp_array[i] = -1;
+		for (int i = 0; i < arrToFill.length; i++) {
+			arrToFill[i] = -1;
 		}
 
-		return temp_array;
+		return arrToFill;
 	}
 
 	private String toBinaryString(int aValue) {
@@ -693,7 +642,7 @@ public class Simplifier {
 		
 		if (aValue == 0)
 		{
-			while (result.length() < VARIABLE)
+			while (result.length() < NUMBER_OF_VARIABLE)
 			{
 				result += "0";
 			}
@@ -703,14 +652,14 @@ public class Simplifier {
 		if (aValue == 1)
 		{
 			result = "1";
-			while (result.length() < VARIABLE)
+			while (result.length() < NUMBER_OF_VARIABLE)
 			{
 				result = "0" + result;
 			}
 			return result;
 		}
 			
-		while (quotient != 0 && quotient != 1) {
+		while (quotient != 0) {
 
 			remainder = quotient % 2;
 			quotient = quotient / 2;

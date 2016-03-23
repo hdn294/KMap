@@ -273,7 +273,7 @@ public class KarnaughMap implements ActionListener {
 			//functionOutput += getFunctionOutput(aValueKMapTable, theKMapTable);
 			
 			functionSimplify = simplifier.getSimplifier(arrMinTerms, arrIgnorances, VARIABLE);			
-			functionOutput += " = " + functionSimplify;
+			functionOutput += functionSimplify;
 		}
 		
 		lblFunction.setText(functionOutput);		
